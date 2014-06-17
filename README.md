@@ -14,13 +14,17 @@ How to use
         salsa::Cypher cypher(key);
         cypher.setIv(iv);
 
-3. Use processBlocks member function to encrypt or decrypt blocks (size of the block equals to 64 bits).
+3. Use processBlocks member function to encrypt or decrypt blocks (size of the block equals to 64 bytes).
    If you would like to process number of bytes not multiple of block size, then use processBytes member function.
 
         cypher.processBlocks(input, output, numBlocks);
         cypher.processBytes(input, output, numBytes);
 
-Note that processBytes may be used only once (typically after processBlocks calls).
+   Note that processBytes may be used only once (typically after processBlocks calls).
+
+4. You can also use cypher to generate key stream (64 bytes):
+
+        cypher.generateKeyStream(keyStream);
 
 LICENSE
 =======
