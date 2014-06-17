@@ -2,6 +2,7 @@ Salsa20
 =======
 
 This is C++11 implementation of the stream cypher Salsa20 based on the reference implementation: http://www.ecrypt.eu.org/stream/salsa20pf.html
+
 Salsa20 home page: http://cr.yp.to/snuffle.html
 
 How to use
