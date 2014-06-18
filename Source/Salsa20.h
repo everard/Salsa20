@@ -65,7 +65,7 @@ namespace salsa
                  * \param[out] output output
                  * \param[in] numBlocks number of blocks
                  */
-                void processBlocks(uint8_t* input, uint8_t* output, size_t numBlocks);
+                void processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks);
 
                 /**
                  * \brief Processes bytes.
@@ -78,7 +78,7 @@ namespace salsa
                  * \param[out] output output
                  * \param[in] numBytes number of bytes
                  */
-                void processBytes(uint8_t* input, uint8_t* output, size_t numBytes);
+                void processBytes(const uint8_t* input, uint8_t* output, size_t numBytes);
 
         private:
                 uint32_t vector_[VECTOR_SIZE];

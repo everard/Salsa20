@@ -12,7 +12,7 @@ namespace salsa
                 setKey(key);
         }
 
-        //-------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
         void Cypher::setKey(const uint8_t* key)
         {
                 static const char constants[] = "expand 32-byte k";
@@ -31,7 +31,7 @@ namespace salsa
                 std::memset(&vector_[6], 0, 4 * sizeof(uint32_t));
         }
 
-        //-------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
         void Cypher::setIv(const uint8_t* iv)
         {
                 if(iv == nullptr)
@@ -41,7 +41,7 @@ namespace salsa
                 std::memset(&vector_[8], 0, 2 * sizeof(uint32_t));
         }
 
-        //-------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
         void Cypher::generateKeyStream(uint8_t output[BLOCK_SIZE])
         {
                 uint32_t x[VECTOR_SIZE];
@@ -93,8 +93,8 @@ namespace salsa
                 vector_[9] += vector_[8] == 0 ? 1 : 0;
         }
 
-        //-------------------------------------------------------------------------------
-        void Cypher::processBlocks(uint8_t* input, uint8_t* output, size_t numBlocks)
+        //---------------------------------------------------------------------------------
+        void Cypher::processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks)
         {
                 uint8_t keyStream[BLOCK_SIZE];
 
@@ -107,8 +107,8 @@ namespace salsa
                 }
         }
 
-        //-------------------------------------------------------------------------------
-        void Cypher::processBytes(uint8_t* input, uint8_t* output, size_t numBytes)
+        //---------------------------------------------------------------------------------
+        void Cypher::processBytes(const uint8_t* input, uint8_t* output, size_t numBytes)
         {
                 const size_t blockSize = BLOCK_SIZE;
                 uint8_t keyStream[BLOCK_SIZE];
@@ -124,7 +124,7 @@ namespace salsa
                 }
         }
 
-        //-------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
         inline uint32_t Cypher::rotate(uint32_t value, uint32_t numBits)
         {
                 return (value << numBits) | (value >> (32 - numBits));
