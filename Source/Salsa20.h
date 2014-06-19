@@ -1,13 +1,18 @@
 // Copyright (c) 2014 Nezametdinov E. Ildus
 // See LICENSE.TXT for licensing details
 
-#ifndef SALSA_20_H
-#define SALSA_20_H
+#ifndef SALSA20_H
+#define SALSA20_H
 
+#include <climits>
 #include <cstdint>
 #include <cstring>
 
-namespace salsa
+#if CHAR_BIT != 8
+#error size of the byte should be 8 bits
+#endif
+
+namespace salsa20
 {
 
         using std::size_t;

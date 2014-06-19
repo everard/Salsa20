@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-using namespace salsa;
+using namespace salsa20;
 
 /**
  * Represents program.
@@ -16,7 +16,7 @@ using namespace salsa;
 class Program
 {
 public:
-        Program(): inputFileName_(), outputFileName_()
+        Program(): inputFileName_(), outputFileName_(), shouldShowHelp_(false)
         {
                 std::memset(key_, 0, sizeof(key_));
         }
@@ -35,59 +35,57 @@ public:
         bool initialize(int argc, char* argv[])
         {
                 std::string key;
-                auto lastArgumentIndex = argc - 1;
+                shouldShowHelp_ = false;
 
                 for(int i = 0; i < argc; ++i)
                 {
                         std::string parameter = argv[i];
 
-                        if(parameter == "-i" && i < lastArgumentIndex)
+                        if(parameter == "-p")
                         {
+                                if((argc - i - 1) != 3)
+                                        break;
+
                                 inputFileName_ = argv[++i];
-                                continue;
-                        }
-
-                        if(parameter == "-o" && i < lastArgumentIndex)
-                        {
                                 outputFileName_ = argv[++i];
-                                continue;
+                                key = argv[++i];
+                                break;
                         }
 
-                        if(parameter == "-k" && i < lastArgumentIndex)
+                        if(parameter == "-h")
                         {
-                                key = argv[++i];
-                                continue;
+                                shouldShowHelp_ = true;
+                                return true;
                         }
                 }
 
                 if(inputFileName_.empty())
                 {
-                        std::cout << "error: input file name should be specified with -i" << std::endl;
+                        std::cout << "E: Input file name was not specified." << std::endl;
                         return false;
                 }
 
                 if(outputFileName_.empty())
                 {
-                        std::cout << "error: output file name should be specified with -o" << std::endl;
+                        std::cout << "E: Output file name was not specified." << std::endl;
                         return false;
                 }
 
                 if(inputFileName_ == outputFileName_)
                 {
-                        std::cout << "error: input and output files should be distinct" << std::endl;
+                        std::cout << "E: Input and output files should be distinct." << std::endl;
                         return false;
                 }
 
                 if(key.empty())
                 {
-                        std::cout << "error: key should be specified with -k" << std::endl;
+                        std::cout << "E: Key was not specified." << std::endl;
                         return false;
                 }
 
                 if(!ReadKeyFromString(key))
                 {
-                        std::cout << "error: key should be passed as HEX value (for example, 00112233...)";
-                        std::cout << " and be " << sizeof(key_) << " bytes long" << std::endl;
+                        std::cout << "E: Invalid key value." << std::endl;
                         return false;
                 }
 
@@ -100,17 +98,32 @@ public:
          */
         bool execute()
         {
+                if(shouldShowHelp_)
+                {
+                        std::cout << "Usage: salsa20 -p INPUT OUTPUT KEY" << std::endl;
+                        std::cout << "       salsa20 -h" << std::endl;
+                        std::cout << std::endl << "Salsa20 is a stream cypher (see http://cr.yp.to/snuffle.html).";
+                        std::cout << std::endl << std::endl;
+                        std::cout << "Options:" << std::endl;
+                        std::cout << "  -h Shows this help text." << std::endl;
+                        std::cout << "  -p Encrypts or decrypts file INPUT with KEY and outputs result to file OUTPUT.";
+                        std::cout << std::endl;
+                        std::cout << "     KEY is a 32-byte key concatenated with 8-byte IV written in HEX.";
+                        std::cout << std::endl;
+                        return true;
+                }
+
                 std::ifstream inputStream(inputFileName_, std::ios_base::binary);
                 if(!inputStream)
                 {
-                        std::cout << "error: could not open input file" << std::endl;
+                        std::cout << "E: Could not open input file." << std::endl;
                         return false;
                 }
 
                 std::ofstream outputStream(outputFileName_, std::ios_base::binary);
                 if(!outputStream)
                 {
-                        std::cout << "error: could not create output file" << std::endl;
+                        std::cout << "E: Could not create output file." << std::endl;
                         return false;
                 }
 
@@ -127,9 +140,9 @@ public:
                 size_t remainderSize = fileSize % chunkSize;
 
                 // process file
-                salsa::Cypher cypher(key_);
+                Cypher cypher(key_);
                 cypher.setIv(&key_[IV_OFFSET]);
-                std::cout << "processing file \"" << inputFileName_ << '"' << std::endl;
+                std::cout << "Processing file \"" << inputFileName_ << '"' << std::endl;
 
                 for(size_t i = 0; i < numChunks; ++i)
                 {
@@ -146,9 +159,10 @@ public:
                         inputStream.read(reinterpret_cast<char*>(chunk), remainderSize);
                         cypher.processBytes(chunk, chunk, remainderSize);
                         outputStream.write(reinterpret_cast<const char*>(chunk), remainderSize);
+                        std::cout << "[100.00]";
                 }
 
-                std::cout << std::endl << "done" << std::endl;
+                std::cout << std::endl << "OK" << std::endl;
                 return true;
         }
 
@@ -156,13 +170,14 @@ private:
         /// Helper constants
         enum
         {
-                NUM_OF_BLOCKS_PER_CHUNK = 4096,
-                IV_OFFSET = salsa::Cypher::KEY_SIZE,
-                KEY_SIZE  = salsa::Cypher::KEY_SIZE + salsa::Cypher::IV_SIZE
+                NUM_OF_BLOCKS_PER_CHUNK = 8192,
+                IV_OFFSET = Cypher::KEY_SIZE,
+                KEY_SIZE  = Cypher::KEY_SIZE + Cypher::IV_SIZE
         };
 
         std::string inputFileName_, outputFileName_;
         uint8_t key_[KEY_SIZE];
+        bool shouldShowHelp_;
 
         /**
          * \brief Reads byte from string.
@@ -183,6 +198,8 @@ private:
                                 value = c - '0';
                         else if(c >= 'A' && c <= 'F')
                                 value = c - 'A';
+                        else if(c >= 'a' && c <= 'f')
+                                value = c - 'a';
                         else
                                 return false;
 

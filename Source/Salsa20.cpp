@@ -3,7 +3,7 @@
 
 #include "Salsa20.h"
 
-namespace salsa
+namespace salsa20
 {
 
         Cypher::Cypher(const uint8_t* key)
