@@ -2,6 +2,7 @@
 // See LICENSE.TXT for licensing details
 
 #include "Salsa20.h"
+#include <cassert>
 
 namespace salsa20
 {
@@ -96,6 +97,8 @@ namespace salsa20
         //---------------------------------------------------------------------------------
         void Cypher::processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks)
         {
+                assert(input != nullptr && output != nullptr);
+
                 uint8_t keyStream[BLOCK_SIZE];
 
                 for(size_t i = 0; i < numBlocks; ++i)
@@ -110,6 +113,8 @@ namespace salsa20
         //---------------------------------------------------------------------------------
         void Cypher::processBytes(const uint8_t* input, uint8_t* output, size_t numBytes)
         {
+                assert(input != nullptr && output != nullptr);
+
                 const size_t blockSize = BLOCK_SIZE;
                 uint8_t keyStream[BLOCK_SIZE];
                 size_t numBytesToProcess;

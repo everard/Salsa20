@@ -151,7 +151,7 @@ public:
                         outputStream.write(reinterpret_cast<const char*>(chunk), sizeof(chunk));
 
                         float percentage = 100.0f * static_cast<float>(i + 1) / static_cast<float>(numChunks);
-                        printf("[%3.2f]\r", percentage);
+                        std::printf("[%3.2f]\r", percentage);
                 }
 
                 if(remainderSize != 0)
@@ -197,13 +197,13 @@ private:
                         if(c >= '0' && c <= '9')
                                 value = c - '0';
                         else if(c >= 'A' && c <= 'F')
-                                value = c - 'A';
+                                value = c - 'A' + 0x0A;
                         else if(c >= 'a' && c <= 'f')
-                                value = c - 'a';
+                                value = c - 'a' + 0x0A;
                         else
                                 return false;
 
-                        byte |= (value << (i * 4));
+                        byte |= (value << (4 - i * 4));
                 }
 
                 return true;
