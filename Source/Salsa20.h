@@ -21,7 +21,7 @@ namespace salsa20
         using std::uint32_t;
 
         /**
-         * Represents Salsa20 cypher. Supports 256-bit keys and little-endian architecture.
+         * Represents Salsa20 cypher. Supports 256-bit keys.
          */
         class Cypher
         {
@@ -95,6 +95,20 @@ namespace salsa20
                  * \return result of the rotation
                  */
                 uint32_t rotate(uint32_t value, uint32_t numBits);
+
+                /**
+                 * \brief Converts 32-bit unsigned integer value to the array of bytes.
+                 * \param[in] value 32-bit unsigned integer value
+                 * \param[out] array array of bytes
+                 */
+                void convert(uint32_t value, uint8_t* array);
+
+                /**
+                 * \brief Converts array of bytes to the 32-bit unsigned integer value.
+                 * \param[in] array array of bytes
+                 * \return 32-bit unsigned integer value
+                 */
+                uint32_t convert(const uint8_t* array);
 
         };
 

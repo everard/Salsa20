@@ -21,15 +21,21 @@ namespace salsa20
                 if(key == nullptr)
                         return;
 
-                std::memcpy(&vector_[1 ], &key[0 ], KEY_SIZE / 2);
-                std::memcpy(&vector_[11], &key[16], KEY_SIZE / 2);
-
-                std::memcpy(&vector_[0 ], &constants[0 ], sizeof(uint32_t));
-                std::memcpy(&vector_[5 ], &constants[4 ], sizeof(uint32_t));
-                std::memcpy(&vector_[10], &constants[8 ], sizeof(uint32_t));
-                std::memcpy(&vector_[15], &constants[12], sizeof(uint32_t));
+                vector_[0] = convert(reinterpret_cast<const uint8_t*>(&constants[0]));
+                vector_[1] = convert(&key[0]);
+                vector_[2] = convert(&key[4]);
+                vector_[3] = convert(&key[8]);
+                vector_[4] = convert(&key[12]);
+                vector_[5] = convert(reinterpret_cast<const uint8_t*>(&constants[4]));
 
                 std::memset(&vector_[6], 0, 4 * sizeof(uint32_t));
+
+                vector_[10] = convert(reinterpret_cast<const uint8_t*>(&constants[8]));
+                vector_[11] = convert(&key[16]);
+                vector_[12] = convert(&key[20]);
+                vector_[13] = convert(&key[24]);
+                vector_[14] = convert(&key[28]);
+                vector_[15] = convert(reinterpret_cast<const uint8_t*>(&constants[12]));
         }
 
         //---------------------------------------------------------------------------------
@@ -38,8 +44,9 @@ namespace salsa20
                 if(iv == nullptr)
                         return;
 
-                std::memcpy(&vector_[6], iv, IV_SIZE);
-                std::memset(&vector_[8], 0, 2 * sizeof(uint32_t));
+                vector_[6] = convert(&iv[0]);
+                vector_[7] = convert(&iv[4]);
+                vector_[8] = vector_[9] = 0;
         }
 
         //---------------------------------------------------------------------------------
@@ -87,7 +94,7 @@ namespace salsa20
                 for(uint32_t i = 0; i < VECTOR_SIZE; ++i)
                 {
                         x[i] += vector_[i];
-                        std::memcpy(&output[4 * i], &x[i], sizeof(uint32_t));
+                        convert(x[i], &output[4 * i]);
                 }
 
                 ++vector_[8];
@@ -133,6 +140,24 @@ namespace salsa20
         inline uint32_t Cypher::rotate(uint32_t value, uint32_t numBits)
         {
                 return (value << numBits) | (value >> (32 - numBits));
+        }
+
+        //---------------------------------------------------------------------------------
+        inline void Cypher::convert(uint32_t value, uint8_t* array)
+        {
+                array[0] = static_cast<uint8_t>(value >> 0);
+                array[1] = static_cast<uint8_t>(value >> 8);
+                array[2] = static_cast<uint8_t>(value >> 16);
+                array[3] = static_cast<uint8_t>(value >> 24);
+        }
+
+        //---------------------------------------------------------------------------------
+        inline uint32_t Cypher::convert(const uint8_t* array)
+        {
+                return ((static_cast<uint32_t>(array[0]) << 0)  |
+                        (static_cast<uint32_t>(array[1]) << 8)  |
+                        (static_cast<uint32_t>(array[2]) << 16) |
+                        (static_cast<uint32_t>(array[3]) << 24));
         }
 
 }
