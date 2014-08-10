@@ -83,7 +83,7 @@ public:
                         return false;
                 }
 
-                if(!ReadKeyFromString(key))
+                if(!readKeyFromString(key))
                 {
                         std::cout << "E: Invalid key value." << std::endl;
                         return false;
@@ -214,7 +214,7 @@ private:
          * \param[in] string string
          * \return true on success
          */
-        bool ReadKeyFromString(const std::string& string)
+        bool readKeyFromString(const std::string& string)
         {
                 if(string.length() != 2 * KEY_SIZE)
                         return false;
