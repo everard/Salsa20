@@ -2,7 +2,7 @@ CXX = g++
 
 all:
 	@mkdir -p bin
-	$(CXX) -Wall -Wextra -O3 -frtti -std=c++11 ./../Source/Main.cpp ./../Source/Salsa20.cpp -o bin/salsa20
+	$(CXX) -Wall -Wextra -O3 -frtti -std=c++11 ./../Source/Main.cpp -o bin/salsa20
 
 clean:
 	@rm -rf bin

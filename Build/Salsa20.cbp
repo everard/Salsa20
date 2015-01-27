@@ -71,8 +71,8 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../Source/Main.cpp" />
-		<Unit filename="../Source/Salsa20.cpp" />
 		<Unit filename="../Source/Salsa20.h" />
+		<Unit filename="../Source/Salsa20.inl" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -1,20 +1,19 @@
-// Copyright (c) 2014 Nezametdinov E. Ildus
+// Copyright (c) 2015 Nezametdinov E. Ildus
 // See LICENSE.TXT for licensing details
 
 #include "Salsa20.h"
-#include <cassert>
 
-namespace salsa20
+namespace ucstk
 {
 
-        Cypher::Cypher(const uint8_t* key)
+        Salsa20::Salsa20(const uint8_t* key)
         {
                 std::memset(vector_, 0, sizeof(vector_));
                 setKey(key);
         }
 
-        //---------------------------------------------------------------------------------
-        void Cypher::setKey(const uint8_t* key)
+        //------------------------------------------------------------------------------------
+        void Salsa20::setKey(const uint8_t* key)
         {
                 static const char constants[] = "expand 32-byte k";
 
@@ -38,8 +37,8 @@ namespace salsa20
                 vector_[15] = convert(reinterpret_cast<const uint8_t*>(&constants[12]));
         }
 
-        //---------------------------------------------------------------------------------
-        void Cypher::setIv(const uint8_t* iv)
+        //------------------------------------------------------------------------------------
+        void Salsa20::setIv(const uint8_t* iv)
         {
                 if(iv == nullptr)
                         return;
@@ -49,8 +48,8 @@ namespace salsa20
                 vector_[8] = vector_[9] = 0;
         }
 
-        //---------------------------------------------------------------------------------
-        void Cypher::generateKeyStream(uint8_t output[BLOCK_SIZE])
+        //------------------------------------------------------------------------------------
+        void Salsa20::generateKeyStream(uint8_t output[BLOCK_SIZE])
         {
                 uint32_t x[VECTOR_SIZE];
                 std::memcpy(x, vector_, sizeof(vector_));
@@ -101,14 +100,14 @@ namespace salsa20
                 vector_[9] += vector_[8] == 0 ? 1 : 0;
         }
 
-        //---------------------------------------------------------------------------------
-        void Cypher::processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks)
+        //------------------------------------------------------------------------------------
+        void Salsa20::processBlocks(const uint8_t* input, uint8_t* output, uint32_t numBlocks)
         {
                 assert(input != nullptr && output != nullptr);
 
                 uint8_t keyStream[BLOCK_SIZE];
 
-                for(size_t i = 0; i < numBlocks; ++i)
+                for(uint32_t i = 0; i < numBlocks; ++i)
                 {
                         generateKeyStream(keyStream);
 
@@ -117,33 +116,32 @@ namespace salsa20
                 }
         }
 
-        //---------------------------------------------------------------------------------
-        void Cypher::processBytes(const uint8_t* input, uint8_t* output, size_t numBytes)
+        //------------------------------------------------------------------------------------
+        void Salsa20::processBytes(const uint8_t* input, uint8_t* output, uint32_t numBytes)
         {
                 assert(input != nullptr && output != nullptr);
 
-                const size_t blockSize = BLOCK_SIZE;
                 uint8_t keyStream[BLOCK_SIZE];
-                size_t numBytesToProcess;
+                uint32_t numBytesToProcess;
 
                 while(numBytes != 0)
                 {
                         generateKeyStream(keyStream);
-                        numBytesToProcess = numBytes >= blockSize ? blockSize : numBytes;
+                        numBytesToProcess = numBytes >= BLOCK_SIZE ? BLOCK_SIZE : numBytes;
 
-                        for(size_t i = 0; i < numBytesToProcess; ++i, --numBytes)
+                        for(uint32_t i = 0; i < numBytesToProcess; ++i, --numBytes)
                                 *(output++) = keyStream[i] ^ *(input++);
                 }
         }
 
-        //---------------------------------------------------------------------------------
-        inline uint32_t Cypher::rotate(uint32_t value, uint32_t numBits)
+        //------------------------------------------------------------------------------------
+        uint32_t Salsa20::rotate(uint32_t value, uint32_t numBits)
         {
                 return (value << numBits) | (value >> (32 - numBits));
         }
 
-        //---------------------------------------------------------------------------------
-        inline void Cypher::convert(uint32_t value, uint8_t* array)
+        //------------------------------------------------------------------------------------
+        void Salsa20::convert(uint32_t value, uint8_t* array)
         {
                 array[0] = static_cast<uint8_t>(value >> 0);
                 array[1] = static_cast<uint8_t>(value >> 8);
@@ -151,8 +149,8 @@ namespace salsa20
                 array[3] = static_cast<uint8_t>(value >> 24);
         }
 
-        //---------------------------------------------------------------------------------
-        inline uint32_t Cypher::convert(const uint8_t* array)
+        //------------------------------------------------------------------------------------
+        uint32_t Salsa20::convert(const uint8_t* array)
         {
                 return ((static_cast<uint32_t>(array[0]) << 0)  |
                         (static_cast<uint32_t>(array[1]) << 8)  |

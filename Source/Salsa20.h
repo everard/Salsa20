@@ -1,33 +1,29 @@
-// Copyright (c) 2014 Nezametdinov E. Ildus
+// Copyright (c) 2015 Nezametdinov E. Ildus
 // See LICENSE.TXT for licensing details
 
 #ifndef SALSA20_H
 #define SALSA20_H
 
+#include <cassert>
 #include <climits>
 #include <cstdint>
 #include <cstring>
 
-#if CHAR_BIT != 8
-#error size of the byte should be 8 bits
-#endif
-
-namespace salsa20
+namespace ucstk
 {
 
-        using std::size_t;
         using std::int32_t;
         using std::uint8_t;
         using std::uint32_t;
 
         /**
-         * Represents Salsa20 cypher. Supports 256-bit keys.
+         * Represents Salsa20 cypher. Supports only 256-bit keys.
          */
-        class Cypher
+        class Salsa20
         {
         public:
                 /// Helper constants
-                enum
+                enum: uint32_t
                 {
                         VECTOR_SIZE = 16,
                         BLOCK_SIZE = 64,
@@ -39,30 +35,30 @@ namespace salsa20
                  * \brief Constructs cypher with given key.
                  * \param[in] key 256-bit key
                  */
-                Cypher(const uint8_t* key = nullptr);
-                Cypher(const Cypher&) = default;
-                Cypher(Cypher&&) = default;
-                ~Cypher() = default;
-                Cypher& operator =(const Cypher&) = default;
-                Cypher& operator =(Cypher&&) = default;
+                inline Salsa20(const uint8_t* key = nullptr);
+                Salsa20(const Salsa20&) = default;
+                Salsa20(Salsa20&&) = default;
+                ~Salsa20() = default;
+                Salsa20& operator =(const Salsa20&) = default;
+                Salsa20& operator =(Salsa20&&) = default;
 
                 /**
                  * \brief Sets key.
                  * \param[in] key 256-bit key
                  */
-                void setKey(const uint8_t* key);
+                inline void setKey(const uint8_t* key);
 
                 /**
                  * \brief Sets IV.
                  * \param[in] iv 64-bit IV
                  */
-                void setIv(const uint8_t* iv);
+                inline void setIv(const uint8_t* iv);
 
                 /**
                  * \brief Generates key stream.
                  * \param[out] output generated key stream
                  */
-                void generateKeyStream(uint8_t output[BLOCK_SIZE]);
+                inline void generateKeyStream(uint8_t output[BLOCK_SIZE]);
 
                 /**
                  * \brief Processes blocks.
@@ -70,7 +66,7 @@ namespace salsa20
                  * \param[out] output output
                  * \param[in] numBlocks number of blocks
                  */
-                void processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks);
+                inline void processBlocks(const uint8_t* input, uint8_t* output, uint32_t numBlocks);
 
                 /**
                  * \brief Processes bytes.
@@ -83,35 +79,37 @@ namespace salsa20
                  * \param[out] output output
                  * \param[in] numBytes number of bytes
                  */
-                void processBytes(const uint8_t* input, uint8_t* output, size_t numBytes);
+                inline void processBytes(const uint8_t* input, uint8_t* output, uint32_t numBytes);
 
         private:
-                uint32_t vector_[VECTOR_SIZE];
-
                 /**
                  * \brief Rotates value.
                  * \param[in] value value
                  * \param[in] numBits number of bits to rotate
                  * \return result of the rotation
                  */
-                uint32_t rotate(uint32_t value, uint32_t numBits);
+                inline uint32_t rotate(uint32_t value, uint32_t numBits);
 
                 /**
                  * \brief Converts 32-bit unsigned integer value to the array of bytes.
                  * \param[in] value 32-bit unsigned integer value
                  * \param[out] array array of bytes
                  */
-                void convert(uint32_t value, uint8_t* array);
+                inline void convert(uint32_t value, uint8_t* array);
 
                 /**
                  * \brief Converts array of bytes to the 32-bit unsigned integer value.
                  * \param[in] array array of bytes
                  * \return 32-bit unsigned integer value
                  */
-                uint32_t convert(const uint8_t* array);
+                inline uint32_t convert(const uint8_t* array);
+
+                // Data members
+                uint32_t vector_[VECTOR_SIZE];
 
         };
 
 }
 
+#include "Salsa20.inl"
 #endif

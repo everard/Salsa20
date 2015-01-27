@@ -1,4 +1,4 @@
-// Copyright (c) 2014 Nezametdinov E. Ildus
+// Copyright (c) 2015 Nezametdinov E. Ildus
 // See LICENSE.TXT for licensing details
 
 #include "Salsa20.h"
@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-using namespace salsa20;
+using namespace ucstk;
 
 /**
  * Represents program.
@@ -127,27 +127,27 @@ public:
                         return false;
                 }
 
-                const size_t chunkSize = NUM_OF_BLOCKS_PER_CHUNK * Cypher::BLOCK_SIZE;
+                const uint32_t chunkSize = NUM_OF_BLOCKS_PER_CHUNK * Salsa20::BLOCK_SIZE;
                 uint8_t chunk[chunkSize];
 
                 // determine size of the file
                 inputStream.seekg(0, std::ios_base::end);
-                size_t fileSize = inputStream.tellg();
+                auto fileSize = inputStream.tellg();
                 inputStream.seekg(0, std::ios_base::beg);
 
                 // compute number of chunks and size of the remainder
-                size_t numChunks = fileSize / chunkSize;
-                size_t remainderSize = fileSize % chunkSize;
+                auto numChunks = fileSize / chunkSize;
+                auto remainderSize = fileSize % chunkSize;
 
                 // process file
-                Cypher cypher(key_);
-                cypher.setIv(&key_[IV_OFFSET]);
+                Salsa20 salsa20(key_);
+                salsa20.setIv(&key_[IV_OFFSET]);
                 std::cout << "Processing file \"" << inputFileName_ << '"' << std::endl;
 
-                for(size_t i = 0; i < numChunks; ++i)
+                for(decltype(numChunks) i = 0; i < numChunks; ++i)
                 {
                         inputStream.read(reinterpret_cast<char*>(chunk), sizeof(chunk));
-                        cypher.processBlocks(chunk, chunk, NUM_OF_BLOCKS_PER_CHUNK);
+                        salsa20.processBlocks(chunk, chunk, NUM_OF_BLOCKS_PER_CHUNK);
                         outputStream.write(reinterpret_cast<const char*>(chunk), sizeof(chunk));
 
                         float percentage = 100.0f * static_cast<float>(i + 1) / static_cast<float>(numChunks);
@@ -157,7 +157,7 @@ public:
                 if(remainderSize != 0)
                 {
                         inputStream.read(reinterpret_cast<char*>(chunk), remainderSize);
-                        cypher.processBytes(chunk, chunk, remainderSize);
+                        salsa20.processBytes(chunk, chunk, remainderSize);
                         outputStream.write(reinterpret_cast<const char*>(chunk), remainderSize);
                         std::cout << "[100.00]";
                 }
@@ -168,16 +168,12 @@ public:
 
 private:
         /// Helper constants
-        enum
+        enum: uint32_t
         {
                 NUM_OF_BLOCKS_PER_CHUNK = 8192,
-                IV_OFFSET = Cypher::KEY_SIZE,
-                KEY_SIZE  = Cypher::KEY_SIZE + Cypher::IV_SIZE
+                IV_OFFSET = Salsa20::KEY_SIZE,
+                KEY_SIZE  = Salsa20::KEY_SIZE + Salsa20::IV_SIZE
         };
-
-        std::string inputFileName_, outputFileName_;
-        uint8_t key_[KEY_SIZE];
-        bool shouldShowHelp_;
 
         /**
          * \brief Reads byte from string.
@@ -189,7 +185,7 @@ private:
         {
                 byte = 0;
 
-                for(size_t i = 0; i < 2; ++i)
+                for(uint32_t i = 0; i < 2; ++i)
                 {
                         uint8_t value = 0;
                         char c = string[i];
@@ -216,10 +212,12 @@ private:
          */
         bool readKeyFromString(const std::string& string)
         {
-                if(string.length() != 2 * KEY_SIZE)
+                auto stringLength = string.length();
+
+                if(stringLength != 2 * KEY_SIZE)
                         return false;
 
-                for(size_t i = 0; i < string.length(); i += 2)
+                for(decltype(stringLength) i = 0; i < stringLength; i += 2)
                 {
                         if(!readByte(&string[i], key_[i / 2]))
                                 return false;
@@ -227,6 +225,11 @@ private:
 
                 return true;
         }
+
+        // Data members
+        std::string inputFileName_, outputFileName_;
+        uint8_t key_[KEY_SIZE];
+        bool shouldShowHelp_;
 
 };
 
