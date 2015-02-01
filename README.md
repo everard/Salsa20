@@ -26,8 +26,8 @@ HOW TO USE
         std::uint8_t keyStream[ucstk::Salsa20::BLOCK_SIZE];
         salsa20.generateKeyStream(keyStream);
 
-COMMAND LINE INTRFACE
-=====================
+COMMAND LINE INTERFACE
+======================
 This repository also contains command line utility which can encrypt and decrypt files. To build it you should run the following
 commands in your shell:
 

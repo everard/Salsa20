@@ -12,7 +12,7 @@ namespace ucstk
                 setKey(key);
         }
 
-        //------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------
         void Salsa20::setKey(const uint8_t* key)
         {
                 static const char constants[] = "expand 32-byte k";
@@ -37,7 +37,7 @@ namespace ucstk
                 vector_[15] = convert(reinterpret_cast<const uint8_t*>(&constants[12]));
         }
 
-        //------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------
         void Salsa20::setIv(const uint8_t* iv)
         {
                 if(iv == nullptr)
@@ -48,7 +48,7 @@ namespace ucstk
                 vector_[8] = vector_[9] = 0;
         }
 
-        //------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------
         void Salsa20::generateKeyStream(uint8_t output[BLOCK_SIZE])
         {
                 uint32_t x[VECTOR_SIZE];
@@ -90,7 +90,7 @@ namespace ucstk
                         x[15] ^= rotate(static_cast<uint32_t>(x[14] + x[13]), 18);
                 }
 
-                for(uint32_t i = 0; i < VECTOR_SIZE; ++i)
+                for(size_t i = 0; i < VECTOR_SIZE; ++i)
                 {
                         x[i] += vector_[i];
                         convert(x[i], &output[4 * i]);
@@ -100,47 +100,47 @@ namespace ucstk
                 vector_[9] += vector_[8] == 0 ? 1 : 0;
         }
 
-        //------------------------------------------------------------------------------------
-        void Salsa20::processBlocks(const uint8_t* input, uint8_t* output, uint32_t numBlocks)
+        //----------------------------------------------------------------------------------
+        void Salsa20::processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks)
         {
                 assert(input != nullptr && output != nullptr);
 
                 uint8_t keyStream[BLOCK_SIZE];
 
-                for(uint32_t i = 0; i < numBlocks; ++i)
+                for(size_t i = 0; i < numBlocks; ++i)
                 {
                         generateKeyStream(keyStream);
 
-                        for(uint32_t j = 0; j < BLOCK_SIZE; ++j)
+                        for(size_t j = 0; j < BLOCK_SIZE; ++j)
                                 *(output++) = keyStream[j] ^ *(input++);
                 }
         }
 
-        //------------------------------------------------------------------------------------
-        void Salsa20::processBytes(const uint8_t* input, uint8_t* output, uint32_t numBytes)
+        //----------------------------------------------------------------------------------
+        void Salsa20::processBytes(const uint8_t* input, uint8_t* output, size_t numBytes)
         {
                 assert(input != nullptr && output != nullptr);
 
                 uint8_t keyStream[BLOCK_SIZE];
-                uint32_t numBytesToProcess;
+                size_t numBytesToProcess;
 
                 while(numBytes != 0)
                 {
                         generateKeyStream(keyStream);
                         numBytesToProcess = numBytes >= BLOCK_SIZE ? BLOCK_SIZE : numBytes;
 
-                        for(uint32_t i = 0; i < numBytesToProcess; ++i, --numBytes)
+                        for(size_t i = 0; i < numBytesToProcess; ++i, --numBytes)
                                 *(output++) = keyStream[i] ^ *(input++);
                 }
         }
 
-        //------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------
         uint32_t Salsa20::rotate(uint32_t value, uint32_t numBits)
         {
                 return (value << numBits) | (value >> (32 - numBits));
         }
 
-        //------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------
         void Salsa20::convert(uint32_t value, uint8_t* array)
         {
                 array[0] = static_cast<uint8_t>(value >> 0);
@@ -149,7 +149,7 @@ namespace ucstk
                 array[3] = static_cast<uint8_t>(value >> 24);
         }
 
-        //------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------
         uint32_t Salsa20::convert(const uint8_t* array)
         {
                 return ((static_cast<uint32_t>(array[0]) << 0)  |

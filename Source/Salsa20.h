@@ -12,6 +12,7 @@
 namespace ucstk
 {
 
+        using std::size_t;
         using std::int32_t;
         using std::uint8_t;
         using std::uint32_t;
@@ -23,7 +24,7 @@ namespace ucstk
         {
         public:
                 /// Helper constants
-                enum: uint32_t
+                enum: size_t
                 {
                         VECTOR_SIZE = 16,
                         BLOCK_SIZE = 64,
@@ -66,7 +67,7 @@ namespace ucstk
                  * \param[out] output output
                  * \param[in] numBlocks number of blocks
                  */
-                inline void processBlocks(const uint8_t* input, uint8_t* output, uint32_t numBlocks);
+                inline void processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks);
 
                 /**
                  * \brief Processes bytes.
@@ -79,7 +80,7 @@ namespace ucstk
                  * \param[out] output output
                  * \param[in] numBytes number of bytes
                  */
-                inline void processBytes(const uint8_t* input, uint8_t* output, uint32_t numBytes);
+                inline void processBytes(const uint8_t* input, uint8_t* output, size_t numBytes);
 
         private:
                 /**

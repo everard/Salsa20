@@ -127,7 +127,7 @@ public:
                         return false;
                 }
 
-                const uint32_t chunkSize = NUM_OF_BLOCKS_PER_CHUNK * Salsa20::BLOCK_SIZE;
+                const auto chunkSize = NUM_OF_BLOCKS_PER_CHUNK * Salsa20::BLOCK_SIZE;
                 uint8_t chunk[chunkSize];
 
                 // determine size of the file
@@ -168,7 +168,7 @@ public:
 
 private:
         /// Helper constants
-        enum: uint32_t
+        enum: size_t
         {
                 NUM_OF_BLOCKS_PER_CHUNK = 8192,
                 IV_OFFSET = Salsa20::KEY_SIZE,
